@@ -12,6 +12,10 @@
 (function() {
     'use strict';
     
+    // Configuration - URLs to redirect
+    const BLOCKED_URL = 'https://hello.world/main.js';
+    const REDIRECT_URL = 'https://helloworld.pro/main.js';
+    
     // Store the original fetch function
     const originalFetch = window.fetch;
     
@@ -26,11 +30,11 @@
             url = input;
         }
         
-        // Check if the request is for hello.world/main.js
-        if (url.includes('https://hello.world/main.js')) {
-            console.log('Blocking request to hello.world/main.js, redirecting to helloworld.pro/main.js');
+        // Check if the request is for the blocked URL
+        if (url.includes(BLOCKED_URL)) {
+            console.log(`Blocking request to ${BLOCKED_URL}, redirecting to ${REDIRECT_URL}`);
             // Replace the URL with the redirect target
-            url = url.replace('https://hello.world/main.js', 'https://helloworld.pro/main.js');
+            url = url.replace(BLOCKED_URL, REDIRECT_URL);
             
             // If it was a Request object, create a new one with the new URL
             if (input instanceof Request) {
@@ -47,10 +51,10 @@
     // Override XMLHttpRequest for additional coverage
     const originalXHROpen = XMLHttpRequest.prototype.open;
     XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
-        // Check if the request is for hello.world/main.js
-        if (url.includes('https://hello.world/main.js')) {
-            console.log('Blocking XMLHttpRequest to hello.world/main.js, redirecting to helloworld.pro/main.js');
-            url = url.replace('https://hello.world/main.js', 'https://helloworld.pro/main.js');
+        // Check if the request is for the blocked URL
+        if (url.includes(BLOCKED_URL)) {
+            console.log(`Blocking XMLHttpRequest to ${BLOCKED_URL}, redirecting to ${REDIRECT_URL}`);
+            url = url.replace(BLOCKED_URL, REDIRECT_URL);
         }
         
         // Call the original open method with the potentially modified URL
@@ -67,9 +71,9 @@
             const originalSetter = Object.getOwnPropertyDescriptor(HTMLScriptElement.prototype, 'src').set;
             Object.defineProperty(element, 'src', {
                 set: function(value) {
-                    if (value.includes('https://hello.world/main.js')) {
-                        console.log('Blocking script src to hello.world/main.js, redirecting to helloworld.pro/main.js');
-                        value = value.replace('https://hello.world/main.js', 'https://helloworld.pro/main.js');
+                    if (value.includes(BLOCKED_URL)) {
+                        console.log(`Blocking script src to ${BLOCKED_URL}, redirecting to ${REDIRECT_URL}`);
+                        value = value.replace(BLOCKED_URL, REDIRECT_URL);
                     }
                     originalSetter.call(this, value);
                 },
@@ -88,9 +92,9 @@
             mutation.addedNodes.forEach(function(node) {
                 if (node.nodeType === 1 && node.tagName === 'SCRIPT') { // Element node and script tag
                     const src = node.getAttribute('src');
-                    if (src && src.includes('https://hello.world/main.js')) {
-                        console.log('Blocking dynamically added script to hello.world/main.js, redirecting to helloworld.pro/main.js');
-                        node.setAttribute('src', src.replace('https://hello.world/main.js', 'https://helloworld.pro/main.js'));
+                    if (src && src.includes(BLOCKED_URL)) {
+                        console.log(`Blocking dynamically added script to ${BLOCKED_URL}, redirecting to ${REDIRECT_URL}`);
+                        node.setAttribute('src', src.replace(BLOCKED_URL, REDIRECT_URL));
                     }
                 }
             });
